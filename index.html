@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>jsplumb-viso</title>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="public/css/bootstrap.css" rel="stylesheet">
+  <!--<link href="https://cdn.bootcss.com/jqueryui/1.12.1/jquery-ui.min.css" rel="stylesheet">-->
+  <link rel="stylesheet" href="public/css/jquery-ui-1.8.4.custom.css">
+  <link rel="stylesheet" href="public/js/zTree/v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
+  <link rel="stylesheet" href="public/css/index.css">
+  <link rel="stylesheet" href="public/js/toastr/toastr.css">
+</head>
+
+<body>
+<div style="z-index: 20000" class="modal fade bs-example-modal-sm" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">编辑连接线</h4>
+      </div>
+      <div id="condition_mode">
+      </div>
+      <div class="modal-footer">
+        <span class="pull-left"><button type="button" id="connect_delete" class="btn btn-danger" data-dismiss="modal"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>删除连接线</button></span>
+        <span class="text-right"> <button type="button" class="btn btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-checkd" aria-hidden="true"></span>取消</button>
+		<button type="button" id="condition_submit" class="btn btn-primary" data-dismiss="modal"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>保存</button></span>
+      </div>
+    </div>
+  </div>
+</div>
+<table class="table">
+  <tr>
+    <td width="200" class="va-t"><ul id="treeDemo" class="ztree"></ul>
+
+    </td>
+    <td class="va-t">
+      <div id="app">
+        <div class="col-md-11 bg-success min-height" id="drop-bg">
+
+        </div>
+
+        <div style="position: fixed;top: 90px; right: 50px;" class="cl pd-5 bg-1 bk-gray mt-20">
+            <span class="l">
+                <a href="javascript:;" id="delete_node_button" class="btn btn-danger radius">删除节点</a>
+                <a class="btn btn-primary radius" id="save_flow_button" href="javascript:;">保存流程</a>
+            </span>
+        </div>
+        <div id="myflow_props" class="panel panel-primary mt-20">
+          <div id="myflow_props_handle" class="panel-heading">属性</div>
+          <table border="1" width="100%" cellpadding="0" cellspacing="0">
+            <tr></tr>
+          </table>
+          <div class="cl pd-5 bg-1 bk-gray mt-20">
+            <a class="btn btn-success" href="#" data-template="tpl-commit" data-type="commit" role="button">
+              保存</a>
+          </div>
+        </div>
+      </div>
+  </td>
+  </tr>
+</table>
+
+
+
+<script id="tpl-Root" type="text/html">
+  <div class='pa' id='{{id}}' style='top:{{top}}px;left:{{left}}px'>
+    <div id='{{id}}-heading' style="" data-id="{{id}}" class="action-panel btn btn-success btn-lg btn-radius" data-type="action">{{name}}
+    </div>
+  </div>
+</script>
+
+<script id="tpl-Action" type="text/html">
+  <div class="pa" id='{{id}}' style='top:{{top}}px;left:{{left}}px' >
+    <div id='{{id}}-heading' data-id="{{id}}" class="action-panel btn btn-primary btn-lg button-rounded" data-type="action">{{name}}
+    </div>
+  </div>
+</script>
+
+<script id="tpl-Exit" type="text/html">
+  <div class="pa" id='{{id}}' style='top:{{top}}px;left:{{left}}px' >
+    <div id='{{id}}-heading' data-id="{{id}}" class="action-panel btn btn-danger btn-lg btn-radius" data-type="action">{{name}}
+    </div>
+  </div>
+</script>
+
+<script id="tpl-tr" type="text/html">
+  <tr>
+    <th class="success">{{desc}}</th>
+    <td>
+      <div class="editor" data-name="{{name}}}">
+        <input style="width:100%;" value="{{value}}" id="{{name}}" >
+      </div>
+    </td>
+  </tr>'
+</script>
+
+<script id="tpl-modal" type="text/html">
+  <div class="modal-body">
+    <input type="hidden" name="txt_connId" id="txt_connId" value="{{connId}}">
+    <div class="form-group">
+      <label for="txt_desc">描述</label>
+      <input type="text" name="txt_desc" class="form-control" id="txt_desc" placeholder="描述" value="{{desc}}">
+    </div>
+    <div class="form-group">
+      <label for="txt_condition">转移条件</label>
+      <input type="text" name="txt_condition" class="form-control" id="txt_condition" placeholder="转移条件（el表达式）" value="{{condition}}">
+    </div>
+  </div>
+</script>
+
+
+
+
+  <script src="https://cdn.bootcss.com/node-uuid/1.4.8/uuid.min.js"></script>
+  <script src="https://cdn.bootcss.com/mustache.js/2.3.0/mustache.min.js"></script>
+
+  <script src="public/js/jquery/1.9.1/jquery.min.js"></script>
+  <script src="public/js/jquery.ui/jquery-ui.js"></script>
+  <script src="public/js/jsPlumb/jquery.jsPlumb.js"></script>
+<script src="public/js/toastr/toastr.js"></script>
+
+<!--请在下方写此页面业务相关的脚本-->
+<script src="public/js/bootstrap/bootstrap3.3.7.min.js"></script>
+<script type="text/javascript" src="public/js/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script src="public/js/data.js"></script>
+  <script src="public/js/actions.js"></script>
+  <script src="public/js/config.js"></script>
+  <script src="public/js/api.js"></script>
+  <script src="public/js/index.js"></script>
+</body>
+</html>
